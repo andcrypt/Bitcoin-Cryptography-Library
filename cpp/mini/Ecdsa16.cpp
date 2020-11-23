@@ -13,17 +13,15 @@
 #include "Ecdsa16.hpp"
 #include "FieldInt16.hpp"
 
-using std::uint16_t;
-
-bool Ecdsa16::sign_simple(const uint16_t privateKey, const uint16_t msgHash, const uint16_t nonce, uint16_t &outR, uint16_t &outS) {
+bool Ecdsa16::sign_simple(const small_type privateKey, const small_type msgHash, const small_type nonce, small_type &outR, small_type &outS) {
     if (nonce==0 || nonce>=CurvePoint16::ORDER) return false;
     CurvePoint16 p = CurvePoint16::G;
     p = CurvePoint16::privateExponentToPublicPoint(nonce);
     if (p.x.value>=CurvePoint16::ORDER && p.x.value<=FieldInt16::MODULUS) return false;
-    uint16_t r = p.x.value % CurvePoint16::ORDER;
+    small_type r = p.x.value % CurvePoint16::ORDER;
     if (r == 0) return false;
     outR = r;
-    uint16_t s = (uint32_t)reciproc(nonce, CurvePoint16::ORDER) * ((msgHash + (uint32_t)r * privateKey) % CurvePoint16::ORDER) % CurvePoint16::ORDER;
+    small_type s = (double_type)reciproc(nonce, CurvePoint16::ORDER) * ((msgHash + (double_type)r * privateKey) % CurvePoint16::ORDER) % CurvePoint16::ORDER;
     if (s == 0) return false;
     s = std::min((int)s, CurvePoint16::ORDER - s);
     outS = s;
@@ -31,7 +29,7 @@ bool Ecdsa16::sign_simple(const uint16_t privateKey, const uint16_t msgHash, con
 }
 
 
-bool Ecdsa16::verify_simple(const CurvePoint16 &publicKey, const uint16_t msgHash, const uint16_t r, const uint16_t s) {
+bool Ecdsa16::verify_simple(const CurvePoint16 &publicKey, const small_type msgHash, const small_type r, const small_type s) {
     if (publicKey == CurvePoint16::ZERO || !(publicKey.z.value==1) ||
         !(publicKey.x*publicKey.x*publicKey.x+FieldInt16(7)==publicKey.y*publicKey.y))
         return false;
@@ -40,9 +38,9 @@ bool Ecdsa16::verify_simple(const CurvePoint16 &publicKey, const uint16_t msgHas
     if (checkzero!=CurvePoint16::ZERO) return false;
     if (!(0 < r && r < CurvePoint16::ORDER)) return false;
     if (!(0 < s && s < CurvePoint16::ORDER)) return false;
-    uint16_t  w = reciproc(s, CurvePoint16::ORDER) % CurvePoint16::ORDER;
-    uint16_t u1 = ((uint32_t)msgHash * w) % CurvePoint16::ORDER;
-    uint16_t u2 = ((uint32_t)r * w) % CurvePoint16::ORDER;
+    small_type  w = reciproc(s, CurvePoint16::ORDER) % CurvePoint16::ORDER;
+    small_type u1 = ((double_type)msgHash * w) % CurvePoint16::ORDER;
+    small_type u2 = ((double_type)r * w) % CurvePoint16::ORDER;
     CurvePoint16 p = CurvePoint16::G;
     CurvePoint16 q = publicKey;
     p.multiply(u1);
@@ -52,22 +50,22 @@ bool Ecdsa16::verify_simple(const CurvePoint16 &publicKey, const uint16_t msgHas
     return r == p.x.value % CurvePoint16::ORDER;
 }
 
-bool Ecdsa16::recovery(const uint16_t msgHash, const uint16_t r, const uint16_t s, CurvePoint16 &publicKeyA, CurvePoint16 &publicKeyB) {
-    const uint16_t &order = CurvePoint16::ORDER;
-    const uint16_t &zero = 0;
+bool Ecdsa16::recovery(const small_type msgHash, const small_type r, const small_type s, CurvePoint16 &publicKeyA, CurvePoint16 &publicKeyB) {
+    const small_type &order = CurvePoint16::ORDER;
+    const small_type &zero = 0;
     if (!(zero < r && r < order && zero < s && s < order))
         return false;
     FieldInt16 rf(r);
     CurvePoint16 R1(rf);
     CurvePoint16 R2 = R1;
     R2.negate();
-    uint16_t rinv = reciproc(r, CurvePoint16::ORDER);
-    uint16_t negmsg;
+    small_type rinv = reciproc(r, CurvePoint16::ORDER);
+    small_type negmsg;
     negmsg = CurvePoint16::ORDER - msgHash;
     if (msgHash>=CurvePoint16::ORDER)
         negmsg+=CurvePoint16::ORDER;
-    uint16_t u1 = ((uint32_t)negmsg * rinv) % CurvePoint16::ORDER;
-    uint16_t u2 = ((uint32_t)s * rinv) % CurvePoint16::ORDER;
+    small_type u1 = ((double_type)negmsg * rinv) % CurvePoint16::ORDER;
+    small_type u2 = ((double_type)s * rinv) % CurvePoint16::ORDER;
     CurvePoint16 u1G = CurvePoint16::G;
     u1G.multiply(u1);
     CurvePoint16 u2R1 = R1;
@@ -83,7 +81,7 @@ bool Ecdsa16::recovery(const uint16_t msgHash, const uint16_t r, const uint16_t 
     return true;
 }
 
-bool Ecdsa16::sign(const uint16_t privateKey, const uint16_t msgHash, const uint16_t nonce, uint16_t &outR, uint16_t &outS) {
+bool Ecdsa16::sign(const small_type privateKey, const small_type msgHash, const small_type nonce, small_type &outR, small_type &outS) {
     /*
      * Algorithm pseudocode:
      * if (nonce outside range [1, order-1]) return false
@@ -96,14 +94,14 @@ bool Ecdsa16::sign(const uint16_t privateKey, const uint16_t msgHash, const uint
      */
     countOps(functionOps);
 
-    const uint16_t &order = CurvePoint16::ORDER;
-    const uint16_t &zero = 0;
+    const small_type &order = CurvePoint16::ORDER;
+    const small_type &zero = 0;
     if (nonce == zero || nonce >= order)
         return false;
     countOps(2 * arithmeticOps);
 
     const CurvePoint16 p = CurvePoint16::privateExponentToPublicPoint(nonce);
-    uint16_t r = p.x.value;
+    small_type r = p.x.value;
     if (r >= order)
         r-= order;
     if (r == zero)
@@ -113,17 +111,17 @@ bool Ecdsa16::sign(const uint16_t privateKey, const uint16_t msgHash, const uint
     countOps(1 * uint16_tCopyOps);
     countOps(1 * curvepointCopyOps);
 
-    uint16_t s = r;
-    const uint16_t z = msgHash;
+    small_type s = r;
+    const small_type z = msgHash;
     multiplyModOrder(s, privateKey);
-    uint32_t carry = ((uint32_t)s+z)>>16;
+    double_type carry = ((double_type)s+z)>>16;
     s+=z;
     if (carry | static_cast<uint32_t>(s >= order))
         s-=order;
     countOps(1 * arithmeticOps);
     countOps(2 * uint16_tCopyOps);
 
-    uint16_t kInv = nonce;
+    small_type kInv = nonce;
     kInv = reciproc(kInv, order);
     multiplyModOrder(s, kInv);
     if (s == zero)
@@ -131,7 +129,7 @@ bool Ecdsa16::sign(const uint16_t privateKey, const uint16_t msgHash, const uint
     countOps(1 * arithmeticOps);
     countOps(1 * uint16_tCopyOps);
 
-    uint16_t negS = order;
+    small_type negS = order;
     negS -= s;
     if (static_cast<uint32_t>(negS < s))
         s = negS;  // To ensure low S values for BIP 62
@@ -141,12 +139,12 @@ bool Ecdsa16::sign(const uint16_t privateKey, const uint16_t msgHash, const uint
     return true;
 }
 
-void Ecdsa16::multiplyModOrder(uint16_t &x, const uint16_t y) {
+void Ecdsa16::multiplyModOrder(small_type &x, const small_type y) {
     /*
      * Russian peasant multiplication with modular reduction at each step. Algorithm pseudocode:
 
      */
-    uint16_t z = 0;
+    small_type z = 0;
     for (int i=15; i>=0; i--) {
         z = (z * 2) % CurvePoint16::ORDER;
         if (y & (1<<i))
@@ -155,7 +153,7 @@ void Ecdsa16::multiplyModOrder(uint16_t &x, const uint16_t y) {
     x = z;
 }
 
-bool Ecdsa16::verify(const CurvePoint16 &publicKey, const uint16_t msgHash, const uint16_t r, const uint16_t s) {
+bool Ecdsa16::verify(const CurvePoint16 &publicKey, const small_type msgHash, const small_type r, const small_type s) {
     /*
      * Algorithm pseudocode:
      * if (pubKey == zero || !(pubKey is normalized) ||
@@ -172,8 +170,8 @@ bool Ecdsa16::verify(const CurvePoint16 &publicKey, const uint16_t msgHash, cons
     countOps(functionOps);
     countOps(11 * arithmeticOps);
 
-    const uint16_t &order = CurvePoint16::ORDER;
-    const uint16_t &zero = 0;
+    const small_type &order = CurvePoint16::ORDER;
+    const small_type &zero = 0;
     CurvePoint16 q = publicKey;
     q.multiply(CurvePoint16::ORDER);
     if (!(zero < r && r < order && zero < s && s < order))
@@ -184,11 +182,11 @@ bool Ecdsa16::verify(const CurvePoint16 &publicKey, const uint16_t msgHash, cons
     countOps(4 * arithmeticOps);
     countOps(1 * curvepointCopyOps);
 
-    uint16_t w = s;
+    small_type w = s;
     w = reciproc(w,order);
-    const uint16_t z(msgHash);
-    uint16_t u1 = w;
-    uint16_t u2 = w;
+    const small_type z(msgHash);
+    small_type u1 = w;
+    small_type u2 = w;
     multiplyModOrder(u1, z);
     multiplyModOrder(u2, r);
     countOps(4 * uint16_tCopyOps);
@@ -201,7 +199,7 @@ bool Ecdsa16::verify(const CurvePoint16 &publicKey, const uint16_t msgHash, cons
     p.normalize();
     countOps(2 * curvepointCopyOps);
 
-    uint16_t px = p.x.value;
+    small_type px = p.x.value;
     if (static_cast<uint32_t>(px >= order))
     px-= order;
     countOps(1 * uint16_tCopyOps);

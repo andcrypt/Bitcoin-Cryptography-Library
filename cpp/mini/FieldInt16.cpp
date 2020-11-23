@@ -1,9 +1,7 @@
 #include <cassert>
 #include "FieldInt16.hpp"
 
-using std::uint16_t;
-
-FieldInt16::FieldInt16(const uint16_t val) :
+FieldInt16::FieldInt16(const small_type val) :
 		value(val) {
     if (value>=MODULUS)
         value -= MODULUS;
@@ -12,17 +10,17 @@ FieldInt16::FieldInt16(const uint16_t val) :
 
 
 void FieldInt16::add(const FieldInt16 &other) {
-	uint32_t ext = value + other.value;  // Perform addition
-	assert((ext >> 17) == 0);
-    while (ext>=MODULUS)
-        ext -= MODULUS;
-    value = ext;
+    double_type extended = value + other.value;  // Perform addition
+	assert((extended >> 17) == 0);
+    while (extended>=MODULUS)
+        extended -= MODULUS;
+    value = extended;
     assert(*this < MODULUS);
 }
 
 
 void FieldInt16::subtract(const FieldInt16 &other) {
-	int32_t extended = (int32_t)value - other.value;  // Perform subtraction
+    double_stype extended = (double_stype)value - other.value;  // Perform subtraction
     while (extended < 0)
         extended += MODULUS;
     value = extended;
@@ -30,7 +28,7 @@ void FieldInt16::subtract(const FieldInt16 &other) {
 }
 
 void FieldInt16::multiply2() {
-	uint32_t extended = value << 1;
+	double_type extended = value << 1;
     while (extended >= MODULUS)
         extended -= MODULUS;
     value = extended;
@@ -47,7 +45,7 @@ void FieldInt16::sqrt() {
 }
 
 void FieldInt16::negate() {
-    int32_t ext = -value;  // Perform subtraction
+    double_stype ext = -value;  // Perform subtraction
     while (ext<0)
         ext += MODULUS;
     value = ext;
@@ -55,22 +53,21 @@ void FieldInt16::negate() {
 }
 
 void FieldInt16::multiply(const FieldInt16 &other) {
-	uint32_t m = value*other.value;
+	double_type m = value*other.value;
 	value = m % MODULUS;
 	assert(*this < MODULUS);
 }
 
-
-uint16_t reciproc(uint16_t value, const uint16_t modulus) {
+small_type reciproc(small_type value, const small_type modulus) {
     // Extended GCD algorithm
     assert(value != modulus && (modulus & 1) == 1 && modulus > 1 && value < modulus);
-    uint16_t r0 = value;
-    uint16_t r1 = modulus;
+    small_type r0 = value;
+    small_type r1 = modulus;
     int x0 = 1;
     int x1 = 0;
     while (r1>0) {
-        uint16_t r = r0 % r1;
-        uint16_t q = (r0 - r) / r1;
+        small_type r = r0 % r1;
+        small_type q = (r0 - r) / r1;
         int x = x0 - q * x1;
         x0 = x1;
         x1 = x;
@@ -88,7 +85,7 @@ void FieldInt16::reciprocal() {
     value = reciproc(value, MODULUS);
 }
 
-void FieldInt16::power(uint16_t y) {
+void FieldInt16::power(small_type y) {
     FieldInt16 x = *this;
     FieldInt16 one(1);
     *this = one;
@@ -148,14 +145,14 @@ bool FieldInt16::operator>=(const FieldInt16 &other) const {
     return value>=other.value;
 }
 
-bool FieldInt16::operator<(const uint16_t other) const {
+bool FieldInt16::operator<(const small_type other) const {
     return value<other;
 }
 
-bool FieldInt16::operator!=(const uint16_t other) const {
+bool FieldInt16::operator!=(const small_type other) const {
     return value!=other;
 }
 
 
 // Static initializers
-const uint16_t FieldInt16::MODULUS = 65167;
+const small_type FieldInt16::MODULUS = 65167;

@@ -5,17 +5,18 @@
 #pragma once
 
 #include <cstdint>
+#include "toydefs.h"
 
-uint16_t reciproc(uint16_t value, const uint16_t modulus);
+small_type reciproc(small_type value, const small_type modulus);
 
 class FieldInt16 {
 	/*---- Fields ----*/
 
-	public: uint16_t value;
+	public: small_type value;
 	
 	/*---- Constructors ----*/
 	
-	public: explicit FieldInt16(const uint16_t val);
+	public: explicit FieldInt16(const small_type val);
 	
 	/*---- Arithmetic methods ----*/
 	
@@ -46,7 +47,7 @@ class FieldInt16 {
 	// If this number is zero, the reciprocal is zero. Constant-time with respect to this value.
 	public: void reciprocal();
 
-    public: void power(uint16_t y);
+    public: void power(small_type y);
 
     public: void replace(const FieldInt16 &other, uint32_t enable);
 
@@ -70,10 +71,10 @@ class FieldInt16 {
 
     public: bool operator>=(const FieldInt16 &other) const;
 
-    public: bool operator<(const uint16_t other) const;
+    public: bool operator<(const small_type other) const;
 
-    public: bool operator!=(const uint16_t other) const;
+    public: bool operator!=(const small_type other) const;
     /*---- Class constants ----*/
 
-	private: static const uint16_t MODULUS;  // Prime number
+	public: static const small_type MODULUS;  // Prime number
 };
