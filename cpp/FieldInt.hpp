@@ -60,8 +60,12 @@ class FieldInt final : private Uint256 {
 	
 	// Squares this number, modulo the prime. Constant-time with respect to this value.
 	public: void square();
-	
-	
+
+    // Square root
+    public: void sqrt();
+
+    public: void negate();
+
 	// Multiplies the given number into this number, modulo the prime. Constant-time with respect to both values.
 	public: void multiply(const FieldInt &other);
 	
@@ -69,9 +73,11 @@ class FieldInt final : private Uint256 {
 	// Computes the multiplicative inverse of this number with respect to the modulus.
 	// If this number is zero, the reciprocal is zero. Constant-time with respect to this value.
 	public: void reciprocal();
-	
-	
-	/*---- Miscellaneous methods ----*/
+
+    public: void power(uint32_t y);
+    public: void power(Uint256 y);
+
+        /*---- Miscellaneous methods ----*/
 	
 	public: void replace(const FieldInt &other, std::uint32_t enable);
 	

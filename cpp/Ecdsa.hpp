@@ -41,8 +41,9 @@ class Ecdsa final {
 	
 	// Computes x = (x * y) % CurvePoint::ORDER. Requires x < CurvePoint::ORDER, but y is unrestricted.
 	private: static void multiplyModOrder(Uint256 &x, const Uint256 &y);
-	
+
+
+    public: static bool recovery(const Sha256Hash &msgHash, const Uint256 &r, const Uint256 &s, CurvePoint &publicKey);
 	
 	Ecdsa() = delete;  // Not instantiable
-	
 };

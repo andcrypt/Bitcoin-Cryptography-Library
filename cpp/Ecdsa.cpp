@@ -167,3 +167,11 @@ void Ecdsa::multiplyModOrder(Uint256 &x, const Uint256 &y) {
 	x = z;
 	countOps(1 * uint256CopyOps);
 }
+
+bool Ecdsa::recovery(const Sha256Hash &msgHash, const Uint256 &r, const Uint256 &s, CurvePoint &publicKey) {
+    const Uint256 &order = CurvePoint::ORDER;
+    const Uint256 &zero = Uint256::ZERO;
+    if (!(zero < r && r < order && zero < s && s < order))
+        return false;
+
+}

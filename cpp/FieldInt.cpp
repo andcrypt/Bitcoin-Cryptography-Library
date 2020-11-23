@@ -66,6 +66,21 @@ void FieldInt::square() {
 }
 
 
+void FieldInt::sqrt() {
+    Uint256 e = MODULUS;
+    e.add(ONE);
+    e.shiftRight1(1);
+    e.shiftRight1(1);
+    power(e);
+}
+
+void FieldInt::negate() {
+    Uint256 m = MODULUS;
+    m.subtract(*this);
+    FieldInt p(m);
+    *this  = p;
+}
+
 void FieldInt::multiply(const FieldInt &other) {
 	countOps(functionOps);
 	uint32_t difference[NUM_WORDS + 1];
@@ -209,6 +224,31 @@ void FieldInt::reciprocal() {
 	Uint256::reciprocal(MODULUS);
 }
 
+void FieldInt::power(uint32_t y) {
+    FieldInt x = *this;
+    FieldInt one(FieldInt::ONE);
+    *this = one;
+    while (y) {
+        if (y & 1) {
+            multiply(x);
+        }
+        x.multiply(x);
+        y >>= 1;
+    }
+}
+
+void FieldInt::power(Uint256 y) {
+    FieldInt x = *this;
+    FieldInt one(FieldInt::ONE);
+    *this = one;
+    while (y != FieldInt::ZERO) {
+        if (y.value[0] & 1) {
+            multiply(x);
+        }
+        x.multiply(x);
+        y.shiftRight1(1);
+    }
+}
 
 void FieldInt::replace(const FieldInt &other, uint32_t enable) {
 	countOps(functionOps);

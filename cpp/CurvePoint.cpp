@@ -18,6 +18,15 @@ CurvePoint::CurvePoint(const FieldInt &x_, const FieldInt &y_) :
 	x(x_), y(y_), z(FI_ONE) {}
 
 
+CurvePoint::CurvePoint(const FieldInt &x_) :
+        x(x_), y(FI_ZERO), z(FI_ONE) {
+    y = x;
+    y.power(3);
+    y.add(CurvePoint::B);
+    y.sqrt();
+    y.negate();
+}
+
 CurvePoint::CurvePoint(const char *xStr, const char *yStr) :
 	x(xStr), y(yStr), z(FI_ONE) {}
 

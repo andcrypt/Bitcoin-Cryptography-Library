@@ -44,6 +44,10 @@ class CurvePoint final {
 	
 	// Constructs a normalized point (z=1) from the given coordinates. Constant-time with respect to the values.
 	public: explicit CurvePoint(const FieldInt &x_, const FieldInt &y_);
+
+
+    // Find y for given x
+    public: explicit CurvePoint(const FieldInt &x_);
 	
 	
 	// Constructs a normalized point (z=1) from the given string coordinates. Not constant-time.
