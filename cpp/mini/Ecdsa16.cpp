@@ -23,7 +23,7 @@ bool Ecdsa16::sign_simple(const uint16_t privateKey, const uint16_t msgHash, con
     uint16_t r = p.x.value % CurvePoint16::ORDER;
     if (r == 0) return false;
     outR = r;
-    uint16_t s = (int64_t)reciproc(nonce, CurvePoint16::ORDER) * (msgHash + (int64_t)r * privateKey) % CurvePoint16::ORDER;
+    uint16_t s = (uint32_t)reciproc(nonce, CurvePoint16::ORDER) * ((msgHash + (uint32_t)r * privateKey) % CurvePoint16::ORDER) % CurvePoint16::ORDER;
     if (s == 0) return false;
     s = std::min((int)s, CurvePoint16::ORDER - s);
     outS = s;
@@ -114,7 +114,7 @@ bool Ecdsa16::sign(const uint16_t privateKey, const uint16_t msgHash, const uint
     countOps(1 * curvepointCopyOps);
 
     uint16_t s = r;
-    const uint16_t z(msgHash);
+    const uint16_t z = msgHash;
     multiplyModOrder(s, privateKey);
     uint32_t carry = ((uint32_t)s+z)>>16;
     s+=z;
