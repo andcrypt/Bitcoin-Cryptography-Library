@@ -15,20 +15,20 @@
 
 using std::uint16_t;
 
-
-    bool Ecdsa16::sign_simple(const uint16_t privateKey, const uint16_t msgHash, const uint16_t nonce, uint16_t &outR, uint16_t &outS) {
-        if (nonce==0 || nonce>=CurvePoint16::ORDER) return false;
-        CurvePoint16 p = CurvePoint16::G;
-        p = CurvePoint16::privateExponentToPublicPoint(nonce);
-        uint16_t r = p.x.value % CurvePoint16::ORDER;
-        if (r == 0) return false;
-        outR = r;
-        uint16_t s = (int64_t)reciproc(nonce, CurvePoint16::ORDER) * (msgHash + (int64_t)r * privateKey) % CurvePoint16::ORDER;
-        if (s == 0) return false;
-        s = std::min((int)s, CurvePoint16::ORDER - s);
-        outS = s;
-        return true;
-    }
+bool Ecdsa16::sign_simple(const uint16_t privateKey, const uint16_t msgHash, const uint16_t nonce, uint16_t &outR, uint16_t &outS) {
+    if (nonce==0 || nonce>=CurvePoint16::ORDER) return false;
+    CurvePoint16 p = CurvePoint16::G;
+    p = CurvePoint16::privateExponentToPublicPoint(nonce);
+    if (p.x.value>=CurvePoint16::ORDER && p.x.value<=FieldInt16::MODULUS) return false;
+    uint16_t r = p.x.value % CurvePoint16::ORDER;
+    if (r == 0) return false;
+    outR = r;
+    uint16_t s = (int64_t)reciproc(nonce, CurvePoint16::ORDER) * (msgHash + (int64_t)r * privateKey) % CurvePoint16::ORDER;
+    if (s == 0) return false;
+    s = std::min((int)s, CurvePoint16::ORDER - s);
+    outS = s;
+    return true;
+}
 
 
 bool Ecdsa16::verify_simple(const CurvePoint16 &publicKey, const uint16_t msgHash, const uint16_t r, const uint16_t s) {
