@@ -6,8 +6,6 @@
 #include "CountOps.hpp"
 #include "CurvePoint16.hpp"
 
-using std::uint16_t;
-
 CurvePoint16::CurvePoint16(const FieldInt16 &x_, const FieldInt16 &y_) :
 	x(x_), y(y_), z(FI_ONE) {}
 
@@ -74,7 +72,7 @@ void CurvePoint16::twice() {
     }
 }
 
-void CurvePoint16::multiply(uint16_t n) {
+void CurvePoint16::multiply(small_type n) {
     CurvePoint16 temp = *this;
     CurvePoint16 result = ZERO;
     while (n != 0) {
@@ -157,7 +155,7 @@ bool CurvePoint16::operator!=(const CurvePoint16 &other) const {
 	return !(*this == other);
 }
 
-CurvePoint16 CurvePoint16::privateExponentToPublicPoint(const uint16_t &privExp) {
+CurvePoint16 CurvePoint16::privateExponentToPublicPoint(const small_type &privExp) {
 	assert((0 < privExp) & (privExp < CurvePoint16::ORDER));
 	CurvePoint16 result = CurvePoint16::G;
 	result.multiply(privExp);
@@ -171,8 +169,8 @@ const FieldInt16 CurvePoint16::FI_ZERO(0);
 const FieldInt16 CurvePoint16::FI_ONE (1);
 const FieldInt16 CurvePoint16::A    (0);
 const FieldInt16 CurvePoint16::B    (7);
-const uint16_t  CurvePoint16::ORDER(64879);
+const small_type CurvePoint16::ORDER(TOrder);
 const CurvePoint16 CurvePoint16::G(
-	FieldInt16(62171),
-	FieldInt16(14828));
+	FieldInt16(TGX),
+	FieldInt16(TGY));
 const CurvePoint16 CurvePoint16::ZERO;  // Default constructor

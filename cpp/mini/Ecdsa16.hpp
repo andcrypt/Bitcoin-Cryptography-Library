@@ -22,26 +22,26 @@ class Ecdsa16 final {
 	// Note: The nonce must be unique, unpredictable, and secret. Otherwise the signature may leak the private key.
 	// All successful executions are constant-time with respect to the input values; in order words
 	// one successful execution is indistinguishable from another one based on side channel information.
-	public: static bool sign_simple(const uint16_t privateKey, const uint16_t msgHash, const uint16_t nonce, uint16_t &outR, uint16_t &outS);
-    public: static bool sign(const uint16_t privateKey, const uint16_t msgHash, const uint16_t nonce, uint16_t &outR, uint16_t &outS);
+	public: static bool sign_simple(const small_type privateKey, const small_type msgHash, const small_type nonce, small_type &outR, small_type &outS);
+    public: static bool sign(const small_type privateKey, const small_type msgHash, const small_type nonce, small_type &outR, small_type &outS);
 	
 	
 	// Computes a deterministic nonce based on the HMAC-SHA-256 of the message hash with the private key,
 	// and then performs Ecdsa16 signing. Returns true iff signing is successful (with overwhelming probability).
 	// This has the same constant-time behavior as sign().
-	public: static bool signWithHmacNonce(const uint16_t privateKey, const uint16_t msgHash, uint16_t &outR, uint16_t &outS);
+	public: static bool signWithHmacNonce(const small_type privateKey, const small_type msgHash, small_type &outR, small_type &outS);
 	
 	
 	// Checks whether the given signature, message, and public key are valid together. The public key point
 	// must be normalized. This function does not need to be constant-time because all inputs are public.
-	public: static bool verify_simple(const CurvePoint16 &publicKey, const uint16_t msgHash, const uint16_t r, const uint16_t s);
-    public: static bool verify(const CurvePoint16 &publicKey, const uint16_t msgHash, const uint16_t r, const uint16_t s);
+	public: static bool verify_simple(const CurvePoint16 &publicKey, const small_type msgHash, const small_type r, const small_type s);
+    public: static bool verify(const CurvePoint16 &publicKey, const small_type msgHash, const small_type r, const small_type s);
 	
 	
 	// Computes x = (x * y) % CurvePoint::ORDER. Requires x < CurvePoint::ORDER, but y is unrestricted.
-	private: static void multiplyModOrder(uint16_t &x, const uint16_t y);
+	private: static void multiplyModOrder(small_type &x, const small_type y);
 
-    public: static bool recovery(const uint16_t msgHash, const uint16_t r, const uint16_t s, CurvePoint16 &publicKeyA, CurvePoint16 &publicKeyB);
+    public: static bool recovery(const small_type msgHash, const small_type r, const small_type s, CurvePoint16 &publicKeyA, CurvePoint16 &publicKeyB);
 	
 	Ecdsa16() = delete;  // Not instantiable
 };

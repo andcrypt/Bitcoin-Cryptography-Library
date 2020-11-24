@@ -1,5 +1,7 @@
 #include <cassert>
 #include "FieldInt16.hpp"
+#include <iostream>
+using namespace std;
 
 FieldInt16::FieldInt16(const small_type val) :
 		value(val) {
@@ -11,7 +13,7 @@ FieldInt16::FieldInt16(const small_type val) :
 
 void FieldInt16::add(const FieldInt16 &other) {
     double_type extended = value + other.value;  // Perform addition
-	assert((extended >> 17) == 0);
+	assert((extended >> TBITS+1) == 0);
     while (extended>=MODULUS)
         extended -= MODULUS;
     value = extended;
@@ -20,7 +22,7 @@ void FieldInt16::add(const FieldInt16 &other) {
 
 
 void FieldInt16::subtract(const FieldInt16 &other) {
-    double_stype extended = (double_stype)value - other.value;  // Perform subtraction
+    double_stype extended = (double_stype)value - (double_stype)other.value;  // Perform subtraction
     while (extended < 0)
         extended += MODULUS;
     value = extended;
@@ -45,7 +47,7 @@ void FieldInt16::sqrt() {
 }
 
 void FieldInt16::negate() {
-    double_stype ext = -value;  // Perform subtraction
+    double_stype ext = -(double_stype)value;  // Perform subtraction
     while (ext<0)
         ext += MODULUS;
     value = ext;
@@ -53,7 +55,7 @@ void FieldInt16::negate() {
 }
 
 void FieldInt16::multiply(const FieldInt16 &other) {
-	double_type m = value*other.value;
+	double_type m = (double_type)value*other.value;
 	value = m % MODULUS;
 	assert(*this < MODULUS);
 }
@@ -155,4 +157,4 @@ bool FieldInt16::operator!=(const small_type other) const {
 
 
 // Static initializers
-const small_type FieldInt16::MODULUS = 65167;
+const small_type FieldInt16::MODULUS = TModulus;

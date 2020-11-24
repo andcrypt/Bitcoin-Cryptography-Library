@@ -23,7 +23,7 @@ bool Ecdsa16::sign_simple(const small_type privateKey, const small_type msgHash,
     outR = r;
     small_type s = (double_type)reciproc(nonce, CurvePoint16::ORDER) * ((msgHash + (double_type)r * privateKey) % CurvePoint16::ORDER) % CurvePoint16::ORDER;
     if (s == 0) return false;
-    s = std::min((int)s, CurvePoint16::ORDER - s);
+    s = std::min((double_stype)s, (double_stype)CurvePoint16::ORDER - (double_stype)s);
     outS = s;
     return true;
 }
@@ -114,10 +114,12 @@ bool Ecdsa16::sign(const small_type privateKey, const small_type msgHash, const 
     small_type s = r;
     const small_type z = msgHash;
     multiplyModOrder(s, privateKey);
-    double_type carry = ((double_type)s+z)>>16;
+    double_type carry = ((double_type)s+z)>>TBITS;
     s+=z;
-    if (carry | static_cast<uint32_t>(s >= order))
+    if (static_cast<uint32_t>(s >= order))
         s-=order;
+    else if (carry)
+        s = (double_type)s+TCarry-order;
     countOps(1 * arithmeticOps);
     countOps(2 * uint16_tCopyOps);
 
@@ -145,7 +147,7 @@ void Ecdsa16::multiplyModOrder(small_type &x, const small_type y) {
 
      */
     small_type z = 0;
-    for (int i=15; i>=0; i--) {
+    for (int i=TBITS-1; i>=0; i--) {
         z = (z * 2) % CurvePoint16::ORDER;
         if (y & (1<<i))
             z = (z + x) % CurvePoint16::ORDER;

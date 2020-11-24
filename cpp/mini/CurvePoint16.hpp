@@ -43,7 +43,7 @@ class CurvePoint16 final {
 
 	// Multiplies this point by the given unsigned integer. The resulting state
 	// is usually not normalized. Constant-time with respect to both values.
-	public: void multiply(uint16_t n);
+	public: void multiply(small_type n);
 	
 	
 	// Normalizes the coordinates of this point. Idempotent operation.
@@ -81,7 +81,7 @@ class CurvePoint16 final {
 	
 	// Returns a normalized public curve point for the given private exponent key.
 	// Requires 0 < privExp < ORDER. Constant-time with respect to the value.
-	public: static CurvePoint16 privateExponentToPublicPoint(const uint16_t &privExp);
+	public: static CurvePoint16 privateExponentToPublicPoint(const small_type &privExp);
 	
 	
 	/*---- Class constants ----*/
@@ -90,7 +90,7 @@ class CurvePoint16 final {
 	public: static const FieldInt16 FI_ONE;   // and because of C++'s lack of guarantee of static initialization order.
 	public: static const FieldInt16 A;       // Curve equation parameter
 	public: static const FieldInt16 B;       // Curve equation parameter
-	public: static const uint16_t ORDER;    // Order of base point, which is a prime number
+	public: static const small_type ORDER;    // Order of base point, which is a prime number
 	public: static const CurvePoint16 G;     // Base point (normalized)
 	public: static const CurvePoint16 ZERO;  // Dummy point at infinity (normalized)
 	
