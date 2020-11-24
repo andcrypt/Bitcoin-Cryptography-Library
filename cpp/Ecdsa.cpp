@@ -173,5 +173,5 @@ bool Ecdsa::recovery(const Sha256Hash &msgHash, const Uint256 &r, const Uint256 
     const Uint256 &zero = Uint256::ZERO;
     if (!(zero < r && r < order && zero < s && s < order))
         return false;
-
+    return true;
 }
