@@ -23,7 +23,7 @@ bool Ecdsa16::sign_simple(const small_type privateKey, const small_type msgHash,
     outR = r;
     small_type s = (double_type)reciproc(nonce, CurvePoint16::ORDER) * ((msgHash + (double_type)r * privateKey) % CurvePoint16::ORDER) % CurvePoint16::ORDER;
     if (s == 0) return false;
-    s = std::min((double_stype)s, (double_stype)CurvePoint16::ORDER - (double_stype)s);
+    s = std::min((double_stype)s, (double_stype)((double_stype)CurvePoint16::ORDER - (double_stype)s));
     outS = s;
     return true;
 }
@@ -31,7 +31,7 @@ bool Ecdsa16::sign_simple(const small_type privateKey, const small_type msgHash,
 
 bool Ecdsa16::verify_simple(const CurvePoint16 &publicKey, const small_type msgHash, const small_type r, const small_type s) {
     if (publicKey == CurvePoint16::ZERO || !(publicKey.z.value==1) ||
-        !(publicKey.x*publicKey.x*publicKey.x+FieldInt16(7)==publicKey.y*publicKey.y))
+        !(publicKey.x*publicKey.x*publicKey.x+CurvePoint16::B==publicKey.y*publicKey.y))
         return false;
     CurvePoint16 checkzero = publicKey;
     checkzero.multiply(CurvePoint16::ORDER);
@@ -99,8 +99,8 @@ bool Ecdsa16::sign(const small_type privateKey, const small_type msgHash, const 
     if (nonce == zero || nonce >= order)
         return false;
     countOps(2 * arithmeticOps);
-
     const CurvePoint16 p = CurvePoint16::privateExponentToPublicPoint(nonce);
+    if (p.x.value>=CurvePoint16::ORDER && p.x.value<=FieldInt16::MODULUS) return false;
     small_type r = p.x.value;
     if (r >= order)
         r-= order;

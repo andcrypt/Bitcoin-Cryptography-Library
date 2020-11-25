@@ -168,7 +168,7 @@ CurvePoint16 CurvePoint16::privateExponentToPublicPoint(const small_type &privEx
 const FieldInt16 CurvePoint16::FI_ZERO(0);
 const FieldInt16 CurvePoint16::FI_ONE (1);
 const FieldInt16 CurvePoint16::A    (0);
-const FieldInt16 CurvePoint16::B    (7);
+const FieldInt16 CurvePoint16::B    (TB);
 const small_type CurvePoint16::ORDER(TOrder);
 const CurvePoint16 CurvePoint16::G(
 	FieldInt16(TGX),
