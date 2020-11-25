@@ -1,0 +1,182 @@
+Generating 7-bit curve
+Modulus: 103
+a:       0
+b:       5
+order:   97
+G:      (38,94)
+Q:      (41,88)
+Generating 8-bit curve
+Modulus: 211
+a:       0
+b:       7
+order:   199
+G:      (197,46)
+Q:      (114,72)
+Generating 9-bit curve
+Modulus: 487
+a:       0
+b:       3
+order:   463
+G:      (485,143)
+Q:      (155,327)
+Generating 10-bit curve
+Modulus: 967
+a:       0
+b:       7
+order:   907
+G:      (800,248)
+Q:      (269,673)
+Generating 11-bit curve
+Modulus: 1867
+a:       0
+b:       2
+order:   1783
+G:      (913,1732)
+Q:      (833,1536)
+Generating 12-bit curve
+Modulus: 3907
+a:       0
+b:       5
+order:   3847
+G:      (3203,2016)
+Q:      (3038,243)
+Generating 13-bit curve
+Modulus: 8191
+a:       0
+b:       7
+order:   8011
+G:      (2482,6501)
+Q:      (7368,5567)
+Generating 14-bit curve
+Modulus: 16231
+a:       0
+b:       6
+order:   16189
+G:      (2521,15640)
+Q:      (157,1826)
+Generating 15-bit curve
+Modulus: 32719
+a:       0
+b:       6
+order:   32371
+G:      (27409,12779)
+Q:      (8588,23072)
+Generating 16-bit curve
+Modulus: 65419
+a:       0
+b:       7
+order:   64921
+G:      (3875,25167)
+Q:      (9067,18709)
+Generating 17-bit curve
+Modulus: 130807
+a:       0
+b:       5
+order:   130303
+G:      (27383,3728)
+Q:      (19974,106325)
+Generating 18-bit curve
+Modulus: 261523
+a:       0
+b:       3
+order:   261451
+G:      (112230,173556)
+Q:      (148001,229739)
+Generating 19-bit curve
+Modulus: 523867
+a:       0
+b:       7
+order:   522523
+G:      (405809,318319)
+Q:      (65517,170154)
+Generating 20-bit curve
+Modulus: 1048423
+a:       0
+b:       6
+order:   1046701
+G:      (568755,534158)
+Q:      (540550,815396)
+Generating 21-bit curve
+Modulus: 2096071
+a:       0
+b:       6
+order:   2094343
+G:      (606629,1323664)
+Q:      (1305584,403403)
+Generating 22-bit curve
+Modulus: 4193359
+a:       0
+b:       7
+order:   4192033
+G:      (1958884,155968)
+Q:      (1971884,78350)
+Generating 23-bit curve
+Modulus: 8388427
+a:       0
+b:       5
+order:   8387839
+G:      (4490597,2724852)
+Q:      (526364,1402216)
+Generating 24-bit curve
+Modulus: 16776379
+a:       0
+b:       7
+order:   16768657
+G:      (11378457,6448259)
+Q:      (14650321,8479264)
+Generating 25-bit curve
+Modulus: 33552439
+a:       0
+b:       3
+order:   33546199
+G:      (25851313,26765574)
+Q:      (18442190,27530641)
+Generating 26-bit curve
+Modulus: 67108819
+a:       0
+b:       2
+order:   67094497
+G:      (21246416,20878137)
+Q:      (47942557,17569191)
+Generating 27-bit curve
+Modulus: 134217199
+a:       0
+b:       6
+order:   134195287
+G:      (28815848,48734783)
+Q:      (77489929,35974873)
+Generating 28-bit curve
+Modulus: 268435147
+a:       0
+b:       3
+order:   268402669
+G:      (8461086,22433297)
+Q:      (166385308,268310861)
+Generating 29-bit curve
+Modulus: 536868811
+a:       0
+b:       3
+order:   536840599
+G:      (489245202,402935498)
+Q:      (6037341,318948709)
+Generating 30-bit curve
+Modulus: 1073740951
+a:       0
+b:       6
+order:   1073711479
+G:      (749495672,189309777)
+Q:      (653798224,435379775)
+Generating 31-bit curve
+Modulus: 2147481487
+a:       0
+b:       7
+order:   2147393683
+G:      (852049855,1929410230)
+Q:      (1667399279,1971807392)
+Generating 32-bit curve
+Modulus: 4294964599
+a:       0
+b:       7
+order:   4294847587
+G:      (436232230,2963027258)
+Q:      (1174877258,2024221806)

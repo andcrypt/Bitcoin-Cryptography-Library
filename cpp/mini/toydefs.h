@@ -47,6 +47,12 @@ const small_type TOrder = 2147411683;
 #define TGX 1921962486
 #define TGY 4944776
 #define TB 7
+#elif TBITS==32
+const small_type TModulus = 4294965487;
+const small_type TOrder = 4294835119;
+#define TGX 1854307490
+#define TGY 1099871433
+#define TB 5
 #endif
 const double_type TCarry = double_type(1) << double_type(TBITS);
 const small_type NegateMask = TCarry-1;
