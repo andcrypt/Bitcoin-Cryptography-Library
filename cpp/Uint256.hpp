@@ -28,8 +28,8 @@ class Uint256 {
 	/*---- Fields ----*/
 	
 	// The mutable words representing this number in little endian, conceptually like this:
-	// actualValue = value[0] << 0 | value[1] << 32 | ... | value[7] << 224.
-	public: std::uint32_t value[NUM_WORDS];
+	// actualValue = limbs[0] << 0 | limbs[1] << 32 | ... | limbs[7] << 224.
+	public: std::uint32_t limbs[NUM_WORDS];
 	
 	
 	

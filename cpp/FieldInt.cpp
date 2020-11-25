@@ -22,7 +22,7 @@ FieldInt::FieldInt(const char *str) :
 	// initializing a FieldInt constant, this class's modulus might not have been initialized yet.
 	// Thus the assertion must be exempted in this situation. This logic relies on the fact that uninitialized
 	// static variables are set to zero. Hence, only do the assertion if the modulus has been initialized already.
-	if (MODULUS.value[0] != 0)
+	if (MODULUS.limbs[0] != 0)
 		assert(*this < MODULUS);
 }
 
@@ -88,7 +88,7 @@ void FieldInt::multiply(const FieldInt &other) {
 	if (USE_X8664_ASM_IMPL) {
 		// Compute raw product of (uint256 this->value) * (uint256 other.value) = (uint512 product0), via long multiplication
 		uint32_t product0[NUM_WORDS * 2];
-		asm_FieldInt_multiply256x256eq512(&product0[0], &this->value[0], &other.value[0]);
+		asm_FieldInt_multiply256x256eq512(&product0[0], &this->value.limbs[0], &other.value.limbs[0]);
 		countOps(105 * arithmeticOps);
 		
 		// Barrett reduction algorithm begins here (see https://www.nayuki.io/page/barrett-reduction-algorithm).
@@ -117,7 +117,7 @@ void FieldInt::multiply(const FieldInt &other) {
 			countOps(1 * arithmeticOps);
 			for (int j = 0; j < NUM_WORDS; j++) {
 				countOps(loopBodyOps);
-				uint64_t sum = static_cast<uint64_t>(this->value[i]) * other.value[j];
+				uint64_t sum = static_cast<uint64_t>(this->value.limbs[i]) * other.value.limbs[j];
 				sum += static_cast<uint64_t>(product0[i + j]) + carry;  // Does not overflow
 				product0[i + j] = static_cast<uint32_t>(sum);
 				carry = static_cast<uint32_t>(sum >> 32);
@@ -210,7 +210,7 @@ void FieldInt::multiply(const FieldInt &other) {
 	}
 	
 	// Final conditional subtraction to yield a FieldInt value
-	std::memcpy(this->value, difference, sizeof(value));
+	std::memcpy(this->value.limbs, difference, sizeof(value));
 	countOps(functionOps);
 	countOps(NUM_WORDS * arithmeticOps);
 	uint32_t dosub = static_cast<uint32_t>((difference[NUM_WORDS] != 0) | (*this >= MODULUS));
@@ -242,7 +242,7 @@ void FieldInt::power(Uint256 y) {
     FieldInt one(FieldInt::ONE);
     *this = one;
     while (y != FieldInt::ZERO) {
-        if (y.value[0] & 1) {
+        if (y.limbs[0] & 1) {
             multiply(x);
         }
         x.multiply(x);

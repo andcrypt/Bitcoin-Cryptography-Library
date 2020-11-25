@@ -27,7 +27,7 @@ class FieldInt final : private Uint256 {
 	
 	/*---- Fields ----*/
 	
-	public: using Uint256::value;
+	public: Uint256 value;
 	
 	
 	
@@ -107,6 +107,6 @@ class FieldInt final : private Uint256 {
 	
 	/*---- Class constants ----*/
 	
-	private: static const Uint256 MODULUS;  // Prime number
+	public: static const Uint256 MODULUS;  // Prime number
 	
 };

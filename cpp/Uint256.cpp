@@ -19,30 +19,30 @@ using std::uint64_t;
 
 
 Uint256::Uint256() :
-	value() {}
+        limbs() {}
 
 
 Uint256::Uint256(const char *str) :
-		value() {
+        limbs() {
 	assert(str != nullptr && std::strlen(str) == NUM_WORDS * 8);
 	for (int i = 0; i < NUM_WORDS * 8; i++) {
 		int digit = Utils::parseHexDigit(str[NUM_WORDS * 8 - 1 - i]);
 		assert(digit != -1);
-		value[i >> 3] |= static_cast<uint32_t>(digit) << ((i & 7) << 2);
+        limbs[i >> 3] |= static_cast<uint32_t>(digit) << ((i & 7) << 2);
 	}
 }
 
 
 Uint256::Uint256(const uint8_t b[NUM_WORDS * 4]) :
-		value() {
+        limbs() {
 	assert(b != nullptr);
 	for (int i = 0; i < NUM_WORDS * 4; i++)
-		value[i >> 2] |= static_cast<uint32_t>(b[NUM_WORDS * 4 - 1 - i]) << ((i & 3) << 3);
+        limbs[i >> 2] |= static_cast<uint32_t>(b[NUM_WORDS * 4 - 1 - i]) << ((i & 3) << 3);
 }
 
 
 Uint256::Uint256(const FieldInt &val) {
-	std::memcpy(this->value, val.value, sizeof(value));
+	std::memcpy(this->limbs, val.value.limbs, sizeof(limbs));
 }
 
 
@@ -51,7 +51,7 @@ uint32_t Uint256::add(const Uint256 &other, uint32_t enable) {
 	countOps(functionOps);
 	if (USE_X8664_ASM_IMPL) {
 		countOps(15 * arithmeticOps);
-		return asm_Uint256_add(&this->value[0], &other.value[0], enable);
+		return asm_Uint256_add(&this->limbs[0], &other.limbs[0], enable);
 	}
 	
 	uint32_t mask = -enable;
@@ -59,8 +59,8 @@ uint32_t Uint256::add(const Uint256 &other, uint32_t enable) {
 	countOps(2 * arithmeticOps);
 	for (int i = 0; i < NUM_WORDS; i++) {
 		countOps(loopBodyOps);
-		uint64_t sum = static_cast<uint64_t>(value[i]) + (other.value[i] & mask) + carry;
-		value[i] = static_cast<uint32_t>(sum);
+		uint64_t sum = static_cast<uint64_t>(limbs[i]) + (other.limbs[i] & mask) + carry;
+        limbs[i] = static_cast<uint32_t>(sum);
 		carry = static_cast<uint32_t>(sum >> 32);
 		assert((carry >> 1) == 0);
 		countOps(8 * arithmeticOps);
@@ -74,7 +74,7 @@ uint32_t Uint256::subtract(const Uint256 &other, uint32_t enable) {
 	countOps(functionOps);
 	if (USE_X8664_ASM_IMPL) {
 		countOps(15 * arithmeticOps);
-		return asm_Uint256_subtract(&this->value[0], &other.value[0], enable);
+		return asm_Uint256_subtract(&this->limbs[0], &other.limbs[0], enable);
 	}
 	
 	uint32_t mask = -enable;
@@ -82,8 +82,8 @@ uint32_t Uint256::subtract(const Uint256 &other, uint32_t enable) {
 	countOps(2 * arithmeticOps);
 	for (int i = 0; i < NUM_WORDS; i++) {
 		countOps(loopBodyOps);
-		uint64_t diff = static_cast<uint64_t>(value[i]) - (other.value[i] & mask) - borrow;
-		value[i] = static_cast<uint32_t>(diff);
+		uint64_t diff = static_cast<uint64_t>(limbs[i]) - (other.limbs[i] & mask) - borrow;
+        limbs[i] = static_cast<uint32_t>(diff);
 		borrow = -static_cast<uint32_t>(diff >> 32);
 		assert((borrow >> 1) == 0);
 		countOps(9 * arithmeticOps);
@@ -96,15 +96,15 @@ uint32_t Uint256::shiftLeft1() {
 	countOps(functionOps);
 	if (USE_X8664_ASM_IMPL) {
 		countOps(6 * arithmeticOps);
-		return asm_Uint256_shiftLeft1(&this->value[0]);
+		return asm_Uint256_shiftLeft1(&this->limbs[0]);
 	}
 	
 	uint32_t prev = 0;
 	countOps(1 * arithmeticOps);
 	for (int i = 0; i < NUM_WORDS; i++) {
 		countOps(loopBodyOps);
-		uint32_t cur = value[i];
-		value[i] = (0U + cur) << 1 | prev >> 31;
+		uint32_t cur = limbs[i];
+        limbs[i] = (0U + cur) << 1 | prev >> 31;
 		prev = cur;
 		countOps(5 * arithmeticOps);
 	}
@@ -117,29 +117,29 @@ void Uint256::shiftRight1(uint32_t enable) {
 	assert((enable >> 1) == 0);
 	countOps(functionOps);
 	if (USE_X8664_ASM_IMPL) {
-		asm_Uint256_shiftRight1(&this->value[0], enable);
+		asm_Uint256_shiftRight1(&this->limbs[0], enable);
 		countOps(21 * arithmeticOps);
 		return;
 	}
 	
 	uint32_t mask = -enable;
-	uint32_t cur = value[0];
+	uint32_t cur = limbs[0];
 	countOps(2 * arithmeticOps);
 	for (int i = 0; i < NUM_WORDS - 1; i++) {
 		countOps(loopBodyOps);
-		uint32_t next = value[i + 1];
-		value[i] = ((cur >> 1 | (0U + next) << 31) & mask) | (cur & ~mask);
+		uint32_t next = limbs[i + 1];
+        limbs[i] = ((cur >> 1 | (0U + next) << 31) & mask) | (cur & ~mask);
 		cur = next;
 		countOps(11 * arithmeticOps);
 	}
-	value[NUM_WORDS - 1] = ((cur >> 1) & mask) | (cur & ~mask);
+    limbs[NUM_WORDS - 1] = ((cur >> 1) & mask) | (cur & ~mask);
 	countOps(6 * arithmeticOps);
 }
 
 
 void Uint256::reciprocal(const Uint256 &modulus) {
 	// Extended binary GCD algorithm
-	assert(&modulus != this && (modulus.value[0] & 1) == 1 && modulus > ONE && *this < modulus);
+	assert(&modulus != this && (modulus.limbs[0] & 1) == 1 && modulus > ONE && *this < modulus);
 	countOps(functionOps);
 	Uint256 x = modulus;
 	Uint256 y = *this;
@@ -159,9 +159,9 @@ void Uint256::reciprocal(const Uint256 &modulus) {
 		//     y /= 2
 		//     b = b % 2 == 0 ? b / 2 : modulus - (modulus - b) / 2
 		// }
-		assert((x.value[0] & 1) == 1);
-		uint32_t yEven = (y.value[0] & 1) ^ 1;
-		uint32_t bOdd = b.value[0] & 1;
+		assert((x.limbs[0] & 1) == 1);
+		uint32_t yEven = (y.limbs[0] & 1) ^1;
+		uint32_t bOdd = b.limbs[0] & 1;
 		y.shiftRight1(yEven);
 		b.shiftRight1(yEven);
 		b.add(halfModulus, yEven & bOdd);
@@ -177,7 +177,7 @@ void Uint256::reciprocal(const Uint256 &modulus) {
 		//     b -= a
 		//     b %= modulus
 		// }
-		uint32_t enable = y.value[0] & 1;
+		uint32_t enable = y.limbs[0] & 1;
 		uint32_t doswap = enable & static_cast<uint32_t>(x > y);
 		x.swap(y, doswap);
 		y.subtract(x, enable);
@@ -195,7 +195,7 @@ void Uint256::replace(const Uint256 &other, uint32_t enable) {
 	assert((enable >> 1) == 0);
 	countOps(functionOps);
 	if (USE_X8664_ASM_IMPL) {
-		asm_Uint256_replace(&this->value[0], &other.value[0], enable);
+		asm_Uint256_replace(&this->limbs[0], &other.limbs[0], enable);
 		countOps(9 * arithmeticOps);
 		return;
 	}
@@ -204,7 +204,7 @@ void Uint256::replace(const Uint256 &other, uint32_t enable) {
 	countOps(1 * arithmeticOps);
 	for (int i = 0; i < NUM_WORDS; i++) {
 		countOps(loopBodyOps);
-		value[i] = (other.value[i] & mask) | (value[i] & ~mask);
+        limbs[i] = (other.limbs[i] & mask) | (limbs[i] & ~mask);
 		countOps(6 * arithmeticOps);
 	}
 }
@@ -214,7 +214,7 @@ void Uint256::swap(Uint256 &other, uint32_t enable) {
 	assert((enable >> 1) == 0);
 	countOps(functionOps);
 	if (USE_X8664_ASM_IMPL) {
-		asm_Uint256_swap(&this->value[0], &other.value[0], enable);
+		asm_Uint256_swap(&this->limbs[0], &other.limbs[0], enable);
 		countOps(17 * arithmeticOps);
 		return;
 	}
@@ -223,10 +223,10 @@ void Uint256::swap(Uint256 &other, uint32_t enable) {
 	countOps(1 * arithmeticOps);
 	for (int i = 0; i < NUM_WORDS; i++) {
 		countOps(loopBodyOps);
-		uint32_t x = this->value[i];
-		uint32_t y = other.value[i];
-		this->value[i] = (y & mask) | (x & ~mask);
-		other.value[i] = (x & mask) | (y & ~mask);
+		uint32_t x = this->limbs[i];
+		uint32_t y = other.limbs[i];
+		this->limbs[i] = (y & mask) | (x & ~mask);
+		other.limbs[i] = (x & mask) | (y & ~mask);
 		countOps(10 * arithmeticOps);
 	}
 }
@@ -235,7 +235,7 @@ void Uint256::swap(Uint256 &other, uint32_t enable) {
 void Uint256::getBigEndianBytes(uint8_t b[NUM_WORDS * 4]) const {
 	assert(b != nullptr);
 	for (int i = 0; i < NUM_WORDS; i++)
-		Utils::storeBigUint32(value[i], &b[(NUM_WORDS - 1 - i) * 4]);
+		Utils::storeBigUint32(limbs[i], &b[(NUM_WORDS - 1 - i) * 4]);
 }
 
 
@@ -243,14 +243,14 @@ bool Uint256::operator==(const Uint256 &other) const {
 	countOps(functionOps);
 	if (USE_X8664_ASM_IMPL) {
 		countOps(9 * arithmeticOps);
-		return asm_Uint256_equalTo(&this->value[0], &other.value[0]);
+		return asm_Uint256_equalTo(&this->limbs[0], &other.limbs[0]);
 	}
 	
 	uint32_t diff = 0;
 	countOps(1 * arithmeticOps);
 	for (int i = 0; i < NUM_WORDS; i++) {
 		countOps(loopBodyOps);
-		diff |= value[i] ^ other.value[i];
+		diff |= limbs[i] ^ other.limbs[i];
 		countOps(4 * arithmeticOps);
 	}
 	countOps(1 * arithmeticOps);
@@ -269,15 +269,15 @@ bool Uint256::operator<(const Uint256 &other) const {
 	countOps(functionOps);
 	if (USE_X8664_ASM_IMPL) {
 		countOps(18 * arithmeticOps);
-		return asm_Uint256_lessThan(&this->value[0], &other.value[0]);
+		return asm_Uint256_lessThan(&this->limbs[0], &other.limbs[0]);
 	}
 	
 	bool result = false;
 	countOps(1 * arithmeticOps);
 	for (int i = 0; i < NUM_WORDS; i++) {
 		countOps(loopBodyOps);
-		bool eq = value[i] == other.value[i];
-		result = (eq & result) | (!eq & (value[i] < other.value[i]));
+		bool eq = limbs[i] == other.limbs[i];
+		result = (eq & result) | (!eq & (limbs[i] < other.limbs[i]));
 		countOps(8 * arithmeticOps);
 	}
 	return result;

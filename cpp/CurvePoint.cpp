@@ -215,7 +215,7 @@ void CurvePoint::multiply(const Uint256 &n) {
 	countOps(1 * curvepointCopyOps);
 	for (int i = Uint256::NUM_WORDS * 32 - tableBits; i >= 0; i -= tableBits) {
 		countOps(loopBodyOps);
-		unsigned int inc = (n.value[i >> 5] >> (i & 31)) & (tableLen - 1);
+		unsigned int inc = (n.limbs[i >> 5] >> (i & 31)) & (tableLen - 1);
 		CurvePoint q = ZERO;  // Dummy initial value
 		countOps(5 * arithmeticOps);
 		countOps(1 * curvepointCopyOps);
@@ -308,7 +308,7 @@ bool CurvePoint::operator!=(const CurvePoint &other) const {
 
 void CurvePoint::toCompressedPoint(uint8_t output[33]) const {
 	assert(output != nullptr);
-	output[0] = static_cast<uint8_t>((y.value[0] & 1) + 0x02);
+	output[0] = static_cast<uint8_t>((y.value.limbs[0] & 1) + 0x02);
 	x.getBigEndianBytes(&output[1]);
 }
 

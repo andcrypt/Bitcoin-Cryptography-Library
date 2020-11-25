@@ -38,6 +38,7 @@ bool Ecdsa::sign(const Uint256 &privateKey, const Sha256Hash &msgHash, const Uin
 	countOps(2 * arithmeticOps);
 	
 	const CurvePoint p = CurvePoint::privateExponentToPublicPoint(nonce);
+    if (p.x.value>=CurvePoint::ORDER && p.x.value<=FieldInt::MODULUS) return false;
 	Uint256 r(p.x);
 	r.subtract(order, static_cast<uint32_t>(r >= order));
 	if (r == zero)
@@ -158,7 +159,7 @@ void Ecdsa::multiplyModOrder(Uint256 &x, const Uint256 &y) {
 		uint32_t c = z.shiftLeft1();
 		z.subtract(mod, c | static_cast<uint32_t>(z >= mod));
 		// Conditionally add x
-		uint32_t enable = (y.value[i >> 5] >> (i & 31)) & 1;
+		uint32_t enable = (y.limbs[i >> 5] >> (i & 31)) & 1;
 		c = z.add(x, enable);
 		z.subtract(mod, c | static_cast<uint32_t>(z >= mod));
 		assert(z < mod);
